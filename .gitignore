@@ -1,0 +1,50 @@
+# =============================================================================
+# SECURITY - NEVER COMMIT THESE
+# =============================================================================
+.env
+.env.local
+.env.production
+*.pem
+*.key
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Generated files
+*.pdf
+output/
+Email_report/
+logs/
+
+# Keep sample data, ignore user data
+data/*
+!data/sample_data.csv
+
+# OS
+.DS_Store
+Thumbs.db
+Thumbs.db
+
