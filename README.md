@@ -42,7 +42,7 @@ The system integrates AI capabilities to transform raw or unstructured data into
 
 1. Input raw data (structured/unstructured)
 2. Process and clean data
-3. Send data to AI API for analysis
+3. Send data to the AI API for analysis
 4. Generate summarized insights
 5. Output a structured business report
 
@@ -60,7 +60,7 @@ This project demonstrates how businesses can:
 
 ## 🎯 Relevance to Technical Support / SaaS
 
-Through this project, I developed practical understanding of:
+Through this project, I developed a practical understanding of:
 
 - API request/response handling  
 - Debugging integration workflows  
@@ -72,12 +72,34 @@ These skills are directly applicable in supporting SaaS platforms that rely on i
 ---
 
 ## 📂 Project Structure
+/project-root
+│── main.py
+│── utils/
+│── data/
+│── output/
+│── README.md
 
 
-## ℹ️ Notes
+---
 
-- **Preview first**: Use `PREVIEW_REPORT.bat` to test before sending
-- **Schedule mode**: Runs continuously, sends at the configured time
-- **Dry-run**: Generates HTML without sending email
-- **Logs**: Check `logs/` folder for detailed operation logs
+## ⚡ Future Improvements
+
+- Add UI dashboard for report visualization
+- Integrate multiple data sources (APIs, CSV, databases)
+- Improve error handling & logging
+- Deploy as a web-based SaaS tool
+
+---
+
+## 👤 Author
+
+**Ihsan Hadhrami**  
+Bilingual (Arabic & English) | Technical Support Aspirant | Automation & AI Enthusiast  
+
+---
+
+## 🔗 Connect With Me
+
+- Portfolio: https://ihsanhadhrami.github.io/My-Portfolio/
+- GitHub: https://github.com/ihsanhadhrami
 
