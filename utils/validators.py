@@ -95,9 +95,16 @@ def validate_csv_data(df: pd.DataFrame, required_columns: List[str] = None) -> p
         if col in df.columns:
             if not pd.api.types.is_numeric_dtype(df[col]):
                 try:
-                    df[col] = pd.to_numeric(df[col], errors='coerce')
+                    converted = pd.to_numeric(df[col], errors='coerce')
+                    invalid_values = df[col].notna() & converted.isna()
+                    if invalid_values.any():
+                        invalid_rows = (df.index[invalid_values] + 2).tolist()
+                        raise ValidationError(
+                            f"Column '{col}' contains non-numeric values at CSV row(s): {invalid_rows}"
+                        )
+                    df[col] = converted
                 except Exception:
-                    logger.warning(f"Could not convert column '{col}' to numeric")
+                    raise
     
     logger.info(f"Validated DataFrame with {len(df)} rows and {len(df.columns)} columns")
     return df

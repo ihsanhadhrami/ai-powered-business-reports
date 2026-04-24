@@ -35,6 +35,32 @@ def get_env(key: str, default: str = None, required: bool = False) -> str:
     return value
 
 
+def get_bool_env(key: str, default: bool = False) -> bool:
+    """Read a boolean environment variable."""
+    value = os.getenv(key)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def get_int_env(key: str, default: int) -> int:
+    """Read an integer environment variable with a clear error."""
+    value = os.getenv(key, str(default))
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise ValueError(f"Environment variable '{key}' must be an integer, got: {value}") from exc
+
+
+def get_float_env(key: str, default: float) -> float:
+    """Read a float environment variable with a clear error."""
+    value = os.getenv(key, str(default))
+    try:
+        return float(value)
+    except ValueError as exc:
+        raise ValueError(f"Environment variable '{key}' must be a number, got: {value}") from exc
+
+
 # =============================================================================
 # EMAIL CONFIGURATION (Set via environment variables)
 # =============================================================================
@@ -43,16 +69,13 @@ def get_env(key: str, default: str = None, required: bool = False) -> str:
 EMAIL_SENDER = get_env('EMAIL_SENDER', '')
 EMAIL_PASSWORD = get_env('EMAIL_PASSWORD', '')
 SMTP_SERVER = get_env('SMTP_SERVER', 'smtp.gmail.com')
-SMTP_PORT = int(get_env('SMTP_PORT', '587'))
+SMTP_PORT = get_int_env('SMTP_PORT', 587)
 
 # Recipients - can be comma-separated in env var or set here
 _recipients_env = get_env('EMAIL_RECIPIENTS', '')
 EMAIL_RECIPIENTS = [
     email.strip() for email in _recipients_env.split(',') if email.strip()
-] if _recipients_env else [
-    # Default recipients (update these)
-    "ihsanhadhrami@yahoo.com",
-]
+] if _recipients_env else []
 
 # Report Settings
 REPORT_FREQUENCY = get_env('REPORT_FREQUENCY', 'daily')  # Options: daily, weekly, monthly
@@ -69,9 +92,13 @@ DATA_SOURCE = {
 # =============================================================================
 
 AI_CONFIG = {
+    # Disabled by default so local dry-runs do not require network/API access.
+    "enabled": get_bool_env('AI_ENABLED', False),
+
     # OpenRouter settings (DeepSeek R1)
     "openrouter_model": get_env('OPENROUTER_MODEL', 'deepseek/deepseek-r1-0528:free'),
-    "openrouter_max_tokens": int(get_env('OPENROUTER_MAX_TOKENS', '150')),
+    "openrouter_max_tokens": get_int_env('OPENROUTER_MAX_TOKENS', 150),
+    "request_timeout": get_int_env('AI_REQUEST_TIMEOUT', 30),
     
     # Site info for OpenRouter rankings (optional)
     "site_url": get_env('SITE_URL', 'http://localhost'),
@@ -79,7 +106,7 @@ AI_CONFIG = {
     
     # Local model settings (Hugging Face)
     "hf_model": get_env('HF_MODEL', 'distilgpt2'),
-    "hf_max_length": int(get_env('HF_MAX_LENGTH', '100')),
+    "hf_max_length": get_int_env('HF_MAX_LENGTH', 100),
     
     # Generation parameters for local models
     "generation_params": {
@@ -90,7 +117,7 @@ AI_CONFIG = {
     },
     
     # Fallback behavior
-    "use_local_model": get_env('USE_LOCAL_MODEL', 'false').lower() == 'true',
+    "use_local_model": get_bool_env('USE_LOCAL_MODEL', False),
 }
 
 # =============================================================================
@@ -98,9 +125,9 @@ AI_CONFIG = {
 # =============================================================================
 
 RETRY_CONFIG = {
-    "max_retries": int(get_env('MAX_RETRIES', '3')),
-    "base_delay": float(get_env('RETRY_BASE_DELAY', '1.0')),
-    "max_delay": float(get_env('RETRY_MAX_DELAY', '60.0')),
+    "max_retries": get_int_env('MAX_RETRIES', 3),
+    "base_delay": get_float_env('RETRY_BASE_DELAY', 1.0),
+    "max_delay": get_float_env('RETRY_MAX_DELAY', 60.0),
 }
 
 # =============================================================================
@@ -109,7 +136,7 @@ RETRY_CONFIG = {
 
 LOG_CONFIG = {
     "level": get_env('LOG_LEVEL', 'INFO'),
-    "to_file": get_env('LOG_TO_FILE', 'false').lower() == 'true',
+    "to_file": get_bool_env('LOG_TO_FILE', False),
     "log_dir": get_env('LOG_DIR', 'logs'),
 }
 

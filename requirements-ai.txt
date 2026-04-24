@@ -1,0 +1,4 @@
+# Optional local Hugging Face AI backend.
+# Install only if you want USE_LOCAL_MODEL=true and have model files cached locally.
+transformers>=4.30.0
+torch>=1.13.0

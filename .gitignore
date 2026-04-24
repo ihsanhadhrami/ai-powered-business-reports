@@ -23,6 +23,9 @@ build/
 
 # Testing
 .pytest_cache/
+.pytest_basetemp/
+.pytest_run_tmp*/
+.test_tmp/
 .coverage
 htmlcov/
 .tox/

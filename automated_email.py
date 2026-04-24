@@ -195,20 +195,20 @@ def send_email(
         )
         
         logger.info(f"Email sent successfully to {len(recipients)} recipient(s)")
-        print(f"✅ Email sent successfully to {len(recipients)} recipient(s)")
+        print(f"[OK] Email sent successfully to {len(recipients)} recipient(s)")
         return True
         
     except smtplib.SMTPAuthenticationError as e:
         logger.error(f"SMTP Authentication failed. Check credentials: {e}")
-        print(f"❌ Authentication failed. Check your email credentials.")
+        print("[ERROR] Authentication failed. Check your email credentials.")
         return False
     except smtplib.SMTPException as e:
         logger.error(f"SMTP error after retries: {e}")
-        print(f"❌ Failed to send email: {e}")
+        print(f"[ERROR] Failed to send email: {e}")
         return False
     except Exception as e:
         logger.error(f"Unexpected error sending email: {e}")
-        print(f"❌ Failed to send email: {e}")
+        print(f"[ERROR] Failed to send email: {e}")
         return False
 
 if __name__ == "__main__":
@@ -221,7 +221,7 @@ if __name__ == "__main__":
     # Create interactive demo content
     interactive_content = f"""
     <div class="alert info">
-        📊 Interactive Report Demo - {current_date} at {current_time}
+        Interactive Report Demo - {current_date} at {current_time}
     </div>
 
     <h2>Performance Dashboard</h2>
@@ -243,19 +243,19 @@ if __name__ == "__main__":
 
     <div class="card-grid">
         <div class="card">
-            <h3>🌟 Top Performer</h3>
+            <h3>Top Performer</h3>
             <p>Sales Team Alpha</p>
             <span class="status success">Exceeding Target</span>
         </div>
         <div class="card">
-            <h3>📈 Growth Markets</h3>
+            <h3>Growth Markets</h3>
             <p>APAC Region</p>
             <span class="status warning">High Potential</span>
         </div>
     </div>
 
     <div class="alert success">
-        🎯 All KPIs are meeting or exceeding expectations
+        All KPIs are meeting or exceeding expectations
     </div>
 
     <h3>Monthly Trends</h3>
@@ -292,7 +292,7 @@ if __name__ == "__main__":
     )
 
     if success:
-        print("✅ Interactive demo email sent successfully!")
+        print("[OK] Interactive demo email sent successfully!")
         print("\nThis demo showed how to use:")
         print("1. KPI Cards with animations")
         print("2. Status indicators (success/warning)")
@@ -302,4 +302,4 @@ if __name__ == "__main__":
         print("6. Gradient header")
         print("7. Interactive buttons")
     else:
-        print("❌ Failed to send demo email")
+        print("[ERROR] Failed to send demo email")
