@@ -36,21 +36,41 @@ sending or AI insights locally.
 
 ## 2. Deploy the backend
 
-The backend is a standard Docker container — deployable anywhere. `backend/render.yaml`
-is one concrete example (Render, free tier, no CLI needed); the same
-`backend/Dockerfile` works unchanged on Fly.io, Railway, or a VPS.
+The backend is a standard Docker container — deployable anywhere.
+`fly.toml` (repo root) is the documented default (Fly.io); `backend/render.yaml`
+is a Render alternative; the same `backend/Dockerfile` works unchanged on
+Railway or a VPS too.
+
+**Fly.io:**
+```bash
+# One-time: https://fly.io/docs/flyctl/install/, then `fly auth login`
+fly launch --no-deploy   # detects fly.toml, creates the app, picks a region
+
+fly secrets set \
+  EMAIL_SENDER=you@gmail.com \
+  EMAIL_PASSWORD=your-gmail-app-password \
+  EMAIL_RECIPIENTS=a@example.com,b@example.com \
+  API_AUTH_TOKEN=some-random-string \
+  ALLOWED_ORIGINS=https://ai-powered-business-reports.<subdomain>.workers.dev
+
+fly deploy
+```
+- `EMAIL_PASSWORD` must be a Gmail [App Password](https://myaccount.google.com/apppasswords), not your real password.
+- `fly launch` will ask to rename the app if `ai-powered-business-reports-api`
+  (set in `fly.toml`) is already taken — any name works, just note the
+  resulting URL, e.g. `https://<your-app-name>.fly.dev`.
+- `fly.toml` sets `min_machines_running = 0`, so the machine stops when idle
+  and cold-starts on the next request — budget-friendly for a tool used a
+  few times a day, at the cost of a several-second delay after idle periods.
+- To update env vars later: `fly secrets set KEY=value` (triggers a redeploy).
 
 **Render:**
 1. Push this repo to GitHub.
 2. In the Render dashboard: New → Blueprint → point at the repo (it reads `backend/render.yaml`).
-3. Set the env vars Render prompts for: `EMAIL_SENDER`, `EMAIL_PASSWORD` (a
-   Gmail [App Password](https://myaccount.google.com/apppasswords), not your
-   real password), `EMAIL_RECIPIENTS`, `API_AUTH_TOKEN` (pick a random
-   string), `ALLOWED_ORIGINS` (your Worker's URL, added after step 3 below —
-   can be updated later).
+3. Set the env vars Render prompts for (same list as the Fly `secrets set` above).
 4. Note the deployed URL, e.g. `https://business-reports-api.onrender.com`.
 
-**Fly.io / Railway / a VPS:** build the same image —
+**Railway / a VPS:** build the same image —
 `docker build -f backend/Dockerfile -t business-reports-api .` (build context
 must be the repo root) — and set the same env vars.
 
