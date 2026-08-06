@@ -68,9 +68,29 @@ npx wrangler secret put API_AUTH_TOKEN         # same value set on the backend, 
 npx wrangler deploy
 ```
 
-Wrangler prints the deployed URL (`https://business-reports-app.<subdomain>.workers.dev`
+Wrangler prints the deployed URL (`https://ai-powered-business-reports.<subdomain>.workers.dev`
 by default, or a custom domain if configured in the Cloudflare dashboard).
 Add that URL to the backend's `ALLOWED_ORIGINS` env var so CORS allows it.
+
+**Alternative: Cloudflare dashboard Git integration**, instead of the CLI
+steps above — connect the repo under Workers & Pages, then in that Worker's
+**Settings → Build** set:
+
+- Root directory: `/` (repo root — leave as default)
+- Build command:
+  ```
+  npm install --prefix frontend && npm run build --prefix frontend && npm install --prefix worker
+  ```
+- Deploy command:
+  ```
+  npx wrangler deploy --config worker/wrangler.toml
+  ```
+
+`--prefix`/`--config` avoid depending on what the Root directory setting
+actually changes (it doesn't move the build command's working directory,
+only where it looks for config, in current Cloudflare Workers Builds). Set
+`BACKEND_URL` and `API_AUTH_TOKEN` under **Settings → Variables and Secrets**
+for this path, since the Git integration doesn't run `wrangler secret put`.
 
 ## 4. Verify
 
