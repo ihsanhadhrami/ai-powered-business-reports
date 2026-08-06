@@ -299,7 +299,7 @@ def generate_email_content_from_metrics(
     subject = _generate_subject(kpis_dict, report_title)
 
     kpi_cards = []
-    for key, value in list(kpis_dict.items())[:6]:
+    for key, value in kpis_dict.items():
         display_key = html.escape(_format_metric_name(key))
         display_value = f"{value:,.2f}" if isinstance(value, float) else str(value)
         kpi_cards.append(

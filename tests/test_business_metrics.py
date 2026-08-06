@@ -73,6 +73,7 @@ class TestBusinessMetrics:
     
     def test_generate_summary_html(self, sample_dataframe):
         """Test HTML summary generation."""
+        pytest.importorskip("plotly")
         metrics = BusinessMetrics(sample_dataframe)
         html = metrics.generate_summary_html()
         
