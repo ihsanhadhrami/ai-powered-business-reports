@@ -5,7 +5,6 @@ Includes universal business KPIs and trend analysis
 
 import pandas as pd
 from datetime import datetime
-import plotly.graph_objects as go
 
 class BusinessMetrics:
     def __init__(self, data: pd.DataFrame):
@@ -34,6 +33,8 @@ class BusinessMetrics:
         """Generate a HTML fragment (Plotly) for the trend chart of a column."""
         if column not in self.data.columns:
             return ''
+        import plotly.graph_objects as go
+
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=self.data['Date'], y=self.data[column], name=column, line=dict(color='#2E86C1')))
         ma = self.calculate_moving_average(column)
