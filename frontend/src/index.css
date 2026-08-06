@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Design tokens distilled from the semrush.com reference screenshots */
+  --color-ink: #0f0f10;
+  --color-ink-soft: #4b4b52;
+  --color-violet: #8b5cf6;
+  --color-violet-dark: #6d3ff0;
+  --color-lime: #93f87a;
+  --color-blue: #2452d9;
+  --color-mint-tint: #e3fce8;
+  --color-danger: #ff4d4f;
+  --color-warn: #ff8a3d;
+  --color-hero-from: #ecf9f2;
+  --color-hero-to: #f1ecfb;
+  --color-wave-from: #14b8a6;
+  --color-wave-to: #8b5cf6;
+
+  --radius-2xl: 1.25rem;
+}
+
+@layer base {
+  body {
+    @apply bg-white text-ink font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-extrabold tracking-tight text-ink;
+  }
+}
+
+@layer components {
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .pill-primary {
+    background: var(--color-ink);
+    color: white;
+  }
+  .pill-primary:hover {
+    background: var(--color-ink-soft);
+  }
+
+  .pill-outline {
+    background: white;
+    color: var(--color-ink);
+    border: 2px solid var(--color-ink);
+  }
+  .pill-outline:hover {
+    background: var(--color-ink);
+    color: white;
+  }
+
+  .pill-violet {
+    background: var(--color-violet);
+    color: var(--color-ink);
+  }
+  .pill-violet:hover {
+    background: var(--color-violet-dark);
+  }
+
+  .pill-outline-white {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+  }
+  .pill-outline-white:hover {
+    background: white;
+    color: var(--color-ink);
+  }
+}
+
+@layer utilities {
+  .bg-hero-gradient {
+    background: linear-gradient(180deg, var(--color-hero-from) 0%, var(--color-hero-to) 100%);
+  }
+
+  .diagonal-stripes::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgba(0, 0, 0, 0.08) 0px,
+      rgba(0, 0, 0, 0.08) 2px,
+      transparent 2px,
+      transparent 10px
+    );
+    -webkit-mask-image: linear-gradient(to bottom left, black, transparent 45%);
+    mask-image: linear-gradient(to bottom left, black, transparent 45%);
+  }
+}

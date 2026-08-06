@@ -140,6 +140,21 @@ LOG_CONFIG = {
     "log_dir": get_env('LOG_DIR', 'logs'),
 }
 
+# =============================================================================
+# WEB API CONFIGURATION
+# =============================================================================
+
+# Shared secret required via the X-API-Key header on sensitive backend routes.
+# Left empty by default so local development needs no setup; set it before
+# deploying the backend publicly.
+API_AUTH_TOKEN = get_env('API_AUTH_TOKEN', '')
+
+# CORS origins allowed to call the backend (comma-separated).
+_allowed_origins_env = get_env('ALLOWED_ORIGINS', '')
+ALLOWED_ORIGINS = [
+    origin.strip() for origin in _allowed_origins_env.split(',') if origin.strip()
+] if _allowed_origins_env else ['http://localhost:5173']
+
 # Report Template (interactive, modern design)
 EMAIL_TEMPLATE = """
 <html>

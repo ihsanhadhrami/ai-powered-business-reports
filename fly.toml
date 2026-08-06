@@ -1,0 +1,32 @@
+# Fly.io app config for the backend API. Lives at the repo root (not inside
+# backend/) because Fly uses the fly.toml's directory as the Docker build
+# context, and backend/Dockerfile expects a repo-root context (it COPYs
+# sibling files like business_metrics.py, config.py, utils/).
+#
+# `app` and `primary_region` match the app `fly launch` already created —
+# don't change them without also running `fly apps` to confirm.
+#
+# Deploying:
+#   fly secrets set EMAIL_SENDER=you@gmail.com EMAIL_PASSWORD=xxxx EMAIL_RECIPIENTS=a@x.com,b@x.com API_AUTH_TOKEN=some-random-string ALLOWED_ORIGINS=https://ai-powered-business-reports.<subdomain>.workers.dev
+#   fly deploy
+app = "ai-powered-business-reports"
+primary_region = "sin"
+
+[build]
+  dockerfile = "backend/Dockerfile"
+
+[env]
+  SMTP_SERVER = "smtp.gmail.com"
+  SMTP_PORT = "587"
+  AI_ENABLED = "false"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

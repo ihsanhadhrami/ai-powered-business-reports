@@ -1,0 +1,30 @@
+# Example Render (render.com) blueprint. Deploy: connect the repo in the
+# Render dashboard and point it at this file, or run `render blueprint launch`.
+# Any other Docker host (Fly.io, Railway, a VPS) works the same way with
+# backend/Dockerfile — this file just documents one concrete option.
+services:
+  - type: web
+    name: business-reports-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: EMAIL_SENDER
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: EMAIL_RECIPIENTS
+        sync: false
+      - key: SMTP_SERVER
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: API_AUTH_TOKEN
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: AI_ENABLED
+        value: "false"
+      - key: OPENROUTER_API_KEY
+        sync: false
