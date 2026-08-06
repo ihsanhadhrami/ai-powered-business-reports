@@ -1,2 +1,35 @@
+# Backend image only needs: business_metrics.py, ai_insights.py,
+# automated_email.py, config.py, run_report.py, utils/, requirements.txt,
+# backend/, and data/sample_data.csv. Everything below is irrelevant to it.
+
+.git/
+.github/
+
+# Frontend and Worker aren't needed inside the backend container
+frontend/
+worker/
+
+# Fly.io / local-only config, not needed inside the image
 fly.toml
-.venv
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+venv/
+env/
+*.egg-info/
+
+# Generated / local-only
+output/
+logs/
+data/uploaded.csv
+.env
+.env.local
+
+# Docs and misc dev files
+*.md
+*.bat
+tests/
+backend/tests/
