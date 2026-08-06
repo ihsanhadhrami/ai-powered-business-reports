@@ -1,0 +1,10 @@
+# Reuses the core app's dependencies (pandas, requests, python-dotenv, etc.)
+-r ../requirements.txt
+
+# Web API layer
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
+
+# Testing (FastAPI's TestClient requires httpx)
+httpx>=0.27.0

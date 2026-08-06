@@ -134,6 +134,14 @@ The diagnostic checks:
 
 It never prints the API key value.
 
+## Web App
+
+The same report pipeline is also available as a browser app: a FastAPI
+backend (`backend/`) wraps the modules above unchanged, a React/Vite frontend
+(`frontend/`) provides the dashboard, and a Cloudflare Worker (`worker/`)
+serves the frontend and proxies `/api/*` to the backend. See
+[`DEPLOYMENT.md`](./DEPLOYMENT.md) for local development and deployment steps.
+
 ## Project Structure
 
 ```text
@@ -151,7 +159,10 @@ Email_report_app/
 |   `-- sample_data.csv
 |-- output/
 |-- tests/
-`-- utils/
+|-- utils/
+|-- backend/        # FastAPI web API (see DEPLOYMENT.md)
+|-- frontend/        # React/Vite/Tailwind dashboard
+`-- worker/          # Cloudflare Worker: serves frontend, proxies /api/*
 ```
 
 ## Use Case
@@ -162,10 +173,10 @@ SaaS-style reporting workflows.
 
 ## Future Improvements
 
-- Add a UI dashboard for report visualization
 - Integrate multiple data sources such as APIs, CSV files, and databases
 - Add richer report templates
-- Deploy as a web-based reporting tool
+- Automate the web app's report sending on a schedule (e.g. a Cloudflare Cron
+  Trigger calling `POST /api/reports/send`)
 
 ## Notes
 

@@ -46,6 +46,11 @@ logs/
 data/*
 !data/sample_data.csv
 
+# Node / JS tooling (frontend/, worker/)
+node_modules/
+.wrangler/
+*.tsbuildinfo
+
 # OS
 .DS_Store
 Thumbs.db

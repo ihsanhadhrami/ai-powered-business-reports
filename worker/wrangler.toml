@@ -1,0 +1,19 @@
+name = "business-reports-app"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+
+# Serves the built frontend (run `npm run build` in ../frontend first).
+[assets]
+directory = "../frontend/dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+# Local dev default — points at `uvicorn backend.main:app` running on 8000.
+# For production, set the real backend URL as a secret instead so it isn't
+# committed to source control:
+#   wrangler secret put BACKEND_URL
+# Also set the shared API key expected by the backend's API_AUTH_TOKEN,
+# if one is configured:
+#   wrangler secret put API_AUTH_TOKEN
+[vars]
+BACKEND_URL = "http://localhost:8000"
