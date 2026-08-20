@@ -228,7 +228,9 @@ The same report pipeline is also available as a browser app: a FastAPI
 backend (`backend/`) wraps the modules above unchanged, a React/Vite frontend
 (`frontend/`) provides the dashboard, and a Cloudflare Worker (`worker/`)
 serves the frontend and proxies `/api/*` to the backend. See
-[`DEPLOYMENT.md`](./DEPLOYMENT.md) for local development and deployment steps.
+[`DEPLOYMENT.md`](./DEPLOYMENT.md) for local development and deployment steps,
+and [`docs/decisions.md`](./docs/decisions.md) for the reasoning behind how
+it's structured.
 
 ---
 

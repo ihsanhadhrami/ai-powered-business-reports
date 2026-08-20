@@ -9,7 +9,6 @@ them over HTTP so a browser-based UI can drive the same pipeline the CLI
 
 import io
 import sys
-from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -21,9 +20,10 @@ from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 import config
-from ai_insights import ai_enabled, generate_email_content_from_metrics, generate_metric_insights
+from ai_insights import ai_enabled
 from automated_email import send_email
 from business_metrics import BusinessMetrics
+from report_builder import build_report
 from run_report import load_data_from_csv
 from utils.logger import setup_logger
 from utils.validators import ValidationError, validate_csv_data
@@ -67,15 +67,6 @@ def _load_current_dataframe() -> pd.DataFrame:
             detail=f"No valid data available at '{csv_path}'. Upload a CSV or check the configured data source.",
         )
     return df
-
-
-def _build_report(df: pd.DataFrame) -> dict:
-    metrics = BusinessMetrics(df)
-    kpis = metrics.calculate_kpis()
-    insights = generate_metric_insights(kpis)
-    title = f"Business Performance Report - {datetime.now().strftime('%B %d, %Y')}"
-    content = generate_email_content_from_metrics(kpis, title, insights=insights)
-    return {"kpis": kpis, "insights": insights, "subject": content["subject"], "html": content["body"]}
 
 
 def _data_info(df: pd.DataFrame) -> DataInfoResponse:
@@ -153,7 +144,7 @@ def get_chart(column: str, _: None = Depends(require_api_key)) -> ChartResponse:
 @app.get("/api/reports/preview", response_model=ReportPreviewResponse)
 def preview_report(_: None = Depends(require_api_key)) -> ReportPreviewResponse:
     df = _load_current_dataframe()
-    return ReportPreviewResponse(**_build_report(df))
+    return ReportPreviewResponse(**build_report(df))
 
 
 @app.post("/api/reports/send", response_model=SendReportResponse)
@@ -161,7 +152,7 @@ def send_report(
     payload: SendReportRequest = SendReportRequest(), _: None = Depends(require_api_key)
 ) -> SendReportResponse:
     df = _load_current_dataframe()
-    report = _build_report(df)
+    report = build_report(df)
 
     success = send_email(
         subject=report["subject"],

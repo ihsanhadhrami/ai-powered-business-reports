@@ -1,76 +1,84 @@
-import { useState } from 'react'
+import { PaperPlaneTilt } from '@phosphor-icons/react'
 import type { ReportPreviewResponse } from '../api/client'
 import { formatLabel, formatValue } from '../lib/format'
+import { cn } from '../lib/utils'
+import { Alert } from './ui/alert'
+import { Button } from './ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card'
+import { Skeleton } from './ui/skeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
+
+interface SendStatus {
+  type: 'idle' | 'success' | 'error'
+  message?: string
+}
 
 interface ReportPreviewPanelProps {
   preview: ReportPreviewResponse | null
   loading: boolean
   onRegenerate: () => void
+  onSend: () => void
+  sending: boolean
+  sendStatus: SendStatus
+  emailConfigured: boolean
 }
 
-const SECTIONS = ['Overview', 'Email Preview'] as const
-type Section = (typeof SECTIONS)[number]
-
-export function ReportPreviewPanel({ preview, loading, onRegenerate }: ReportPreviewPanelProps) {
-  const [tab, setTab] = useState<Section>('Overview')
-
+export function ReportPreviewPanel({
+  preview,
+  loading,
+  onRegenerate,
+  onSend,
+  sending,
+  sendStatus,
+  emailConfigured,
+}: ReportPreviewPanelProps) {
   return (
-    <section id="dashboard" className="mx-auto max-w-6xl px-6 py-16">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl">Report Preview</h2>
-        <button
-          onClick={onRegenerate}
-          disabled={loading}
-          className="pill pill-outline text-sm py-2 px-4 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+    <Card id="dashboard">
+      <CardHeader className="flex-row items-center justify-between space-y-0">
+        <CardTitle>Report preview</CardTitle>
+        <Button variant="outline" size="sm" onClick={onRegenerate} disabled={loading}>
           {loading ? 'Regenerating…' : 'Regenerate'}
-        </button>
-      </div>
-      <div className="rounded-2xl border border-black/10 shadow-xl shadow-black/5 overflow-hidden bg-white">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-black/10 bg-[#f8fafc]">
-          <span className="w-3 h-3 rounded-full bg-[#ff5f57]" />
-          <span className="w-3 h-3 rounded-full bg-[#febc2e]" />
-          <span className="w-3 h-3 rounded-full bg-[#28c840]" />
-          <span className="ml-3 text-xs text-ink-soft truncate">
-            {preview?.subject ?? 'No report generated yet'}
-          </span>
-        </div>
-        <div className="flex flex-col md:flex-row">
-          <aside className="md:w-44 shrink-0 border-b md:border-b-0 md:border-r border-black/10 p-4 flex md:block gap-1">
-            {SECTIONS.map((section) => (
-              <button
-                key={section}
-                onClick={() => setTab(section)}
-                className={`text-left text-sm rounded-lg px-3 py-2 mb-1 font-medium ${
-                  tab === section ? 'bg-black/5 text-ink' : 'text-ink-soft hover:bg-black/5'
-                }`}
-              >
-                {section}
-              </button>
-            ))}
-          </aside>
-          <div className="flex-1 min-w-0">
-            {!preview ? (
-              <div className="p-12 text-center text-ink-soft">
-                {loading ? 'Generating report…' : 'Click "Generate Report" to build a preview.'}
-              </div>
-            ) : tab === 'Overview' ? (
-              <div className="p-6 overflow-x-auto">
+        </Button>
+      </CardHeader>
+      <CardContent>
+        {!preview ? (
+          loading ? (
+            <div className="space-y-3 py-6">
+              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-1 py-16 text-center">
+              <p className="text-sm font-semibold">No report generated yet</p>
+              <p className="text-sm text-muted-foreground">Click "Generate Report" to build a preview.</p>
+            </div>
+          )
+        ) : (
+          <Tabs defaultValue="overview">
+            <TabsList className="mb-4">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="email">Email preview</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview">
+              <div className="overflow-x-auto rounded-xl border border-border">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-left text-ink-soft border-b border-black/10">
-                      <th className="py-2 pr-4 font-medium">Metric</th>
-                      <th className="py-2 font-medium">Value</th>
+                    <tr className="border-b border-border text-left text-muted-foreground">
+                      <th className="px-4 py-2.5 font-medium">Metric</th>
+                      <th className="px-4 py-2.5 font-medium">Value</th>
                     </tr>
                   </thead>
                   <tbody>
                     {Object.entries(preview.kpis).map(([key, value]) => (
-                      <tr key={key} className="border-b border-black/5 last:border-0">
-                        <td className="py-2 pr-4">{formatLabel(key)}</td>
+                      <tr key={key} className="border-b border-border last:border-0">
+                        <td className="px-4 py-2.5">{formatLabel(key)}</td>
                         <td
-                          className={`py-2 font-semibold ${
-                            key.includes('growth') && value > 0 ? 'text-emerald-600' : ''
-                          } ${key.includes('growth') && value < 0 ? 'text-danger' : ''}`}
+                          className={cn(
+                            'px-4 py-2.5 font-semibold',
+                            key.includes('growth') && value > 0 && 'text-success',
+                            key.includes('growth') && value < 0 && 'text-destructive',
+                          )}
                         >
                           {formatValue(key, value)}
                         </td>
@@ -78,14 +86,50 @@ export function ReportPreviewPanel({ preview, loading, onRegenerate }: ReportPre
                     ))}
                   </tbody>
                 </table>
-                <p className="mt-6 text-sm leading-relaxed text-ink-soft">{preview.insights}</p>
               </div>
-            ) : (
-              <iframe title="Email preview" srcDoc={preview.html} className="w-full h-[500px] border-0" />
-            )}
-          </div>
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{preview.insights}</p>
+            </TabsContent>
+
+            <TabsContent value="email">
+              <div className="overflow-hidden rounded-xl border border-border">
+                <div className="flex items-center gap-2 border-b border-border bg-secondary px-4 py-2.5">
+                  <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
+                  <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
+                  <span className="h-3 w-3 rounded-full bg-[#28c840]" />
+                  <span className="ml-2 truncate text-xs text-muted-foreground">{preview.subject}</span>
+                </div>
+                <iframe
+                  title="Email preview"
+                  srcDoc={preview.html}
+                  className="h-125 w-full border-0 bg-white"
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+        )}
+      </CardContent>
+
+      {preview && (
+        <CardFooter className="flex-col items-stretch gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">
+            {emailConfigured
+              ? 'Ready to send to the configured recipients.'
+              : "Email isn't configured on the backend yet."}
+          </p>
+          <Button onClick={onSend} disabled={sending || !emailConfigured} className="gap-2">
+            <PaperPlaneTilt size={16} weight="bold" />
+            {sending ? 'Sending…' : 'Send Report'}
+          </Button>
+        </CardFooter>
+      )}
+
+      {sendStatus.type !== 'idle' && (
+        <div className="px-6 pb-6">
+          <Alert variant={sendStatus.type === 'success' ? 'success' : 'destructive'}>
+            {sendStatus.message}
+          </Alert>
         </div>
-      </div>
-    </section>
+      )}
+    </Card>
   )
 }
