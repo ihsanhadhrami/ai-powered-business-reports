@@ -15,10 +15,9 @@ from datetime import datetime
 
 import pandas as pd
 
-from ai_insights import generate_email_content_from_metrics, generate_metric_insights
 from automated_email import send_email
-from business_metrics import BusinessMetrics
 from config import DATA_SOURCE, REPORT_FREQUENCY, REPORT_TIME
+from report_builder import build_report
 from utils.logger import setup_logger
 from utils.validators import ValidationError, validate_csv_data
 
@@ -111,42 +110,28 @@ def generate_and_send_report(dry_run: bool = False, output_path: str | None = No
     print()
 
     print("Step 2: Calculating business metrics and KPIs...")
-    try:
-        metrics = BusinessMetrics(df)
-        kpis = metrics.calculate_kpis()
-        _print_kpis(kpis)
-        print()
-    except Exception as e:
-        print(f"[ERROR] Error calculating metrics: {e}")
-        return False
-
     print("Step 3: Generating report insights...")
-    try:
-        insights = generate_metric_insights(kpis)
-        print("[OK] Insights generated:")
-        preview = insights[:200] + "..." if len(insights) > 200 else insights
-        print(f"   {preview}")
-        print()
-    except Exception as e:
-        print(f"[WARN] Could not generate insights: {e}")
-        insights = "Insights unavailable. Please check AI configuration."
-        print()
-
     print("Step 4: Generating email report...")
     try:
-        report_title = f"Business Performance Report - {datetime.now().strftime('%B %d, %Y')}"
-        email_content = generate_email_content_from_metrics(
-            kpis,
-            report_title,
-            insights=insights,
-        )
-
-        print("[OK] Email generated:")
-        print(f"   Subject: {email_content['subject']}")
-        print()
+        report = build_report(df)
     except Exception as e:
-        print(f"[ERROR] Error generating email: {e}")
+        print(f"[ERROR] Error generating report: {e}")
         return False
+
+    _print_kpis(report["kpis"])
+    print()
+
+    print("[OK] Insights generated:")
+    insights = report["insights"]
+    preview = insights[:200] + "..." if len(insights) > 200 else insights
+    print(f"   {preview}")
+    print()
+
+    print("[OK] Email generated:")
+    print(f"   Subject: {report['subject']}")
+    print()
+
+    email_content = {"subject": report["subject"], "body": report["html"]}
 
     if dry_run:
         print("Step 5: Saving report (DRY RUN - no email will be sent)...")
