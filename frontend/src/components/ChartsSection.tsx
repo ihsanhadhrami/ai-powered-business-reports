@@ -9,6 +9,9 @@ import {
   YAxis,
 } from 'recharts'
 import { api, type ChartResponse } from '../api/client'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { Skeleton } from './ui/skeleton'
+import { Tabs, TabsList, TabsTrigger } from './ui/tabs'
 
 const METRICS = ['Revenue', 'Sales', 'Customer_Count'] as const
 
@@ -45,34 +48,57 @@ export function ChartsSection({ availableColumns }: ChartsSectionProps) {
     : []
 
   return (
-    <section id="charts" className="mx-auto max-w-6xl px-6 py-16">
-      <h2 className="text-3xl mb-6">Trends</h2>
-      <div className="flex flex-wrap gap-2 mb-6">
-        {columns.map((column) => (
-          <button
-            key={column}
-            onClick={() => setActive(column)}
-            className={`pill text-sm py-2 px-4 ${
-              active === column ? 'bg-ink text-white' : 'bg-white border border-black/10 text-ink-soft'
-            }`}
-          >
-            {column.replace('_', ' ')}
-          </button>
-        ))}
-      </div>
-      <div className="rounded-2xl border border-black/10 p-6 h-80">
+    <Card id="charts">
+      <CardHeader className="flex-row items-center justify-between space-y-0">
+        <CardTitle>Trends</CardTitle>
+        <Tabs value={active} onValueChange={setActive}>
+          <TabsList>
+            {columns.map((column) => (
+              <TabsTrigger key={column} value={column}>
+                {column.replace('_', ' ')}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      </CardHeader>
+      <CardContent className="h-80">
         {chart ? (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-              <XAxis dataKey="date" tick={{ fontSize: 12 }} minTickGap={30} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Line type="monotone" dataKey="value" stroke="#2452D9" strokeWidth={2} dot={false} name={active} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                minTickGap={30}
+                axisLine={{ stroke: 'hsl(var(--border))' }}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '0.75rem',
+                  color: 'hsl(var(--foreground))',
+                  fontSize: '0.875rem',
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="hsl(var(--primary))"
+                strokeWidth={2.5}
+                dot={false}
+                name={active}
+              />
               <Line
                 type="monotone"
                 dataKey="trend"
-                stroke="#8B5CF6"
+                stroke="hsl(var(--muted-foreground))"
                 strokeWidth={2}
                 strokeDasharray="4 4"
                 dot={false}
@@ -81,11 +107,9 @@ export function ChartsSection({ availableColumns }: ChartsSectionProps) {
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-full flex items-center justify-center text-ink-soft text-sm">
-            Loading chart…
-          </div>
+          <Skeleton className="h-full w-full" />
         )}
-      </div>
-    </section>
+      </CardContent>
+    </Card>
   )
 }

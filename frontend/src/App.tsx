@@ -6,15 +6,15 @@ import {
   type DataInfoResponse,
   type ReportPreviewResponse,
 } from './api/client'
-import { TopBar } from './components/TopBar'
-import { Hero } from './components/Hero'
-import { KpiStrip } from './components/KpiStrip'
-import { HighlightTiles } from './components/HighlightTiles'
-import { ReportPreviewPanel } from './components/ReportPreviewPanel'
+import { AppHeader } from './components/AppHeader'
 import { ChartsSection } from './components/ChartsSection'
+import { DashboardHeader } from './components/DashboardHeader'
 import { DataUpload } from './components/DataUpload'
-import { SendCta } from './components/SendCta'
+import { InsightCard } from './components/InsightCard'
+import { KpiGrid } from './components/KpiGrid'
+import { ReportPreviewPanel } from './components/ReportPreviewPanel'
 import { SettingsPanel } from './components/SettingsPanel'
+import { Alert } from './components/ui/alert'
 
 type SendStatus = { type: 'idle' | 'success' | 'error'; message?: string }
 
@@ -62,34 +62,45 @@ function App() {
   }, [])
 
   return (
-    <div className="min-h-screen">
-      <TopBar
-        statusMessage={
-          config?.ai_enabled
-            ? 'AI-powered insights are enabled for this report'
-            : 'Running on deterministic local insights'
-        }
-        onGenerateClick={generatePreview}
-        generating={previewLoading}
-      />
-      <Hero dataInfo={dataInfo} onGenerate={generatePreview} generating={previewLoading} />
-      <KpiStrip kpis={preview?.kpis ?? null} />
-      {previewError && (
-        <div className="mx-auto max-w-6xl px-6 pt-6 text-sm text-danger font-medium">
-          {previewError}
+    <div className="min-h-dvh">
+      <AppHeader onGenerateClick={generatePreview} generating={previewLoading} />
+
+      <main className="mx-auto max-w-7xl space-y-8 px-6 py-8">
+        <DashboardHeader
+          dataInfo={dataInfo}
+          aiEnabled={config?.ai_enabled ?? null}
+          onGenerate={generatePreview}
+          generating={previewLoading}
+        />
+
+        {previewError && <Alert variant="destructive">{previewError}</Alert>}
+
+        <KpiGrid kpis={preview?.kpis ?? null} loading={previewLoading} />
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-1">
+            <InsightCard insights={preview?.insights ?? null} loading={previewLoading} />
+          </div>
+          <div className="lg:col-span-2">
+            <ChartsSection availableColumns={dataInfo?.columns ?? []} />
+          </div>
         </div>
-      )}
-      <HighlightTiles kpis={preview?.kpis ?? null} insights={preview?.insights ?? null} />
-      <ReportPreviewPanel preview={preview} loading={previewLoading} onRegenerate={generatePreview} />
-      <ChartsSection availableColumns={dataInfo?.columns ?? []} />
-      <DataUpload dataInfo={dataInfo} onUploaded={setDataInfo} />
-      <SendCta
-        onSend={handleSend}
-        sending={sending}
-        status={sendStatus}
-        emailConfigured={config?.email_configured ?? false}
-      />
-      <SettingsPanel config={config} />
+
+        <ReportPreviewPanel
+          preview={preview}
+          loading={previewLoading}
+          onRegenerate={generatePreview}
+          onSend={handleSend}
+          sending={sending}
+          sendStatus={sendStatus}
+          emailConfigured={config?.email_configured ?? false}
+        />
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <DataUpload dataInfo={dataInfo} onUploaded={setDataInfo} />
+          <SettingsPanel config={config} />
+        </div>
+      </main>
     </div>
   )
 }
